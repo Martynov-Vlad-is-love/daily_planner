@@ -1,16 +1,20 @@
-import 'package:daily_planner_firebase_bloc/widget/custom_text_field.dart';
+import 'package:daily_planner_firebase_bloc/domain/services/firebase_authentication.dart';
+import 'package:daily_planner_firebase_bloc/ui/widget/custom_text_field.dart';
 import 'package:flutter/material.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegistrationPage extends StatefulWidget {
+  const RegistrationPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegistrationPage> createState() => _RegistrationPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegistrationPageState extends State<RegistrationPage> {
   final emailController = TextEditingController(text: '');
   final passwordController = TextEditingController(text: '');
+  final repeatPasswordController = TextEditingController(text: '');
+
+  final _authentication = FirebaseAuthentication();
 
   @override
   Widget build(BuildContext context) {
@@ -20,13 +24,12 @@ class _LoginPageState extends State<LoginPage> {
         height: 10,
       ),
       CustomTextField(emailController: passwordController, label: 'Password'),
-    ];
+      CustomTextField(emailController: repeatPasswordController, label: 'Repeat password'),
 
+    ];
     return Scaffold(
       body: LayoutBuilder(builder: (context, constraints) {
-        return SizedBox(
-          height: constraints.maxHeight,
-          width: constraints.maxWidth,
+        return SingleChildScrollView(
           child: Center(
             child: Padding(
               padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 150),
@@ -35,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
                   const Padding(
                     padding: EdgeInsets.only(bottom: 80.0),
                     child: Text(
-                      'Login page',
+                      'Registration page',
                       style:
                           TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
                     ),
@@ -48,8 +51,22 @@ class _LoginPageState extends State<LoginPage> {
                   Padding(
                     padding: const EdgeInsets.only(top: 40.0),
                     child: ElevatedButton(
-                      onPressed: () {},
-                      child: const Text('Log in'),
+                      onPressed: () async{
+                        if (passwordController.text ==
+                            repeatPasswordController.text) {
+                          final user =
+                              await _authentication.signUpWithEmailAndPassword(
+                                  emailController.text,
+                                  passwordController.text);
+                          if(user != null){
+                            print('Success');
+                          }
+                          else{
+                            print('Failure');
+                          }
+                        }
+                      },
+                      child: const Text('Register'),
                     ),
                   ),
                   Row(
@@ -57,7 +74,10 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       const Text('Do not have an account?'),
                       TextButton(
-                          onPressed: () {}, child: const Text('Register'))
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/login');
+                          },
+                          child: const Text('Back to login page'))
                     ],
                   )
                 ],
