@@ -10,3 +10,10 @@ class AuthLoginEvent extends AuthEvent {
 
   AuthLoginEvent({required this.login, required this.password});
 }
+
+class AuthRegisterEvent extends AuthEvent {
+  final String login;
+  final String password;
+
+  AuthRegisterEvent({required this.login, required this.password});
+}

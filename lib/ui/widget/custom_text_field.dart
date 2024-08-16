@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 class CustomTextField extends StatelessWidget {
   const CustomTextField({
     super.key,
-    required this.emailController,
     required this.label,
+    required this.onChanged
   });
 
-  final TextEditingController emailController;
   final String label;
-
+  final ValueChanged<String>? onChanged;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -19,7 +18,7 @@ class CustomTextField extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
         child: TextFormField(
-          controller: emailController,
+          onChanged: onChanged,
           decoration: InputDecoration(label: Text(label)),
         ),
       ),

@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+
 enum AuthStatus { authorized, notAuthorized, inProgress }
 
 abstract class AuthState {}
@@ -20,7 +22,41 @@ class AuthAuthorizedState extends AuthState {
   @override
   int get hashCode => 0;
 }
+class AuthRegisterState extends AuthState {
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is AuthRegisterState && runtimeType == other.runtimeType;
 
+  @override
+  int get hashCode => 0;
+}
+class AuthRegisterFailedState extends AuthState {
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is AuthRegisterFailedState && runtimeType == other.runtimeType;
+
+  @override
+  int get hashCode => 0;
+}
+
+
+class AuthFirebaseFailureState extends AuthState {
+  FirebaseAuthException error;
+
+  AuthFirebaseFailureState(this.error);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AuthFirebaseFailureState &&
+          runtimeType == other.runtimeType &&
+          error == other.error;
+
+  @override
+  int get hashCode => error.hashCode;
+}
 class AuthFailureState extends AuthState {
   Object error;
 
@@ -29,14 +65,13 @@ class AuthFailureState extends AuthState {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is AuthFailureState &&
-          runtimeType == other.runtimeType &&
-          error == other.error;
+          other is AuthFailureState &&
+              runtimeType == other.runtimeType &&
+              error == other.error;
 
   @override
   int get hashCode => error.hashCode;
 }
-
 class AuthInProgressState extends AuthState {
   @override
   bool operator ==(Object other) =>
