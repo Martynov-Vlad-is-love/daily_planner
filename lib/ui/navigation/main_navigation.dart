@@ -5,10 +5,11 @@ import 'package:flutter/cupertino.dart';
 class MainNavigation {
   static final _screenFactory = ScreenFactory();
 
-  final routes = <String, Widget Function(BuildContext)>{
+  static final routes = <String, Widget Function(BuildContext)>{
     RouteNames.loaderWidget: (_) => _screenFactory.makeLoader(),
     RouteNames.loginPage: (_) => _screenFactory.makeAuth(),
-    RouteNames.mainScreen: (_) => _screenFactory.makeMainScreen()
+    RouteNames.mainScreen: (_) => _screenFactory.makeMainScreen(),
+    RouteNames.registrationPage: (_) => _screenFactory.makeRegister(),
   };
 
   static void resetNavigation(BuildContext context) {

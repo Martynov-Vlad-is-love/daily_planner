@@ -3,57 +3,9 @@ import 'dart:async';
 import 'package:daily_planner_firebase_bloc/domain/blocs/auth_bloc/auth_bloc.dart';
 import 'package:daily_planner_firebase_bloc/domain/blocs/auth_bloc/auth_event.dart';
 import 'package:daily_planner_firebase_bloc/domain/blocs/auth_bloc/auth_state.dart';
+import 'package:daily_planner_firebase_bloc/ui/widget/auth_widget/auth_view_cubit_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-abstract class AuthViewCubitState {}
-
-class AuthViewCubitFormFillInProgressState extends AuthViewCubitState {
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AuthViewCubitFormFillInProgressState &&
-          runtimeType == other.runtimeType;
-
-  @override
-  int get hashCode => 0;
-}
-
-class AuthViewCubitErrorState extends AuthViewCubitState {
-  final String errorMessage;
-
-  AuthViewCubitErrorState(this.errorMessage);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AuthViewCubitErrorState &&
-          runtimeType == other.runtimeType &&
-          errorMessage == other.errorMessage;
-
-  @override
-  int get hashCode => errorMessage.hashCode;
-}
-
-class AuthViewCubitInProgressState extends AuthViewCubitState {
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AuthViewCubitInProgressState && runtimeType == other.runtimeType;
-
-  @override
-  int get hashCode => 0;
-}
-
-class AuthViewCubitSuccessState extends AuthViewCubitState {
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AuthViewCubitSuccessState && runtimeType == other.runtimeType;
-
-  @override
-  int get hashCode => 0;
-}
 
 class AuthViewCubit extends Cubit<AuthViewCubitState> {
   final AuthBloc authBloc;
@@ -77,6 +29,16 @@ class AuthViewCubit extends Cubit<AuthViewCubitState> {
     authBloc.add(AuthLoginEvent(login: login, password: password));
   }
 
+  void  register({required String login, required String password}) {
+    if (!isValid(login, password)) {
+      final state =
+          AuthViewCubitErrorState('Please, fill login and password correctly.');
+      emit(state);
+      return;
+    }
+    authBloc.add(AuthRegisterEvent(login: login, password: password));
+  }
+
   void _onState(AuthState state) {
     if (state is AuthUnauthorizedState) {
       emit(AuthViewCubitFormFillInProgressState());
@@ -85,9 +47,9 @@ class AuthViewCubit extends Cubit<AuthViewCubitState> {
     } else if (state is AuthFirebaseFailureState) {
       final message = _mapErrorToMessage(state.error);
       emit(AuthViewCubitErrorState(message));
-    } else if(state is AuthInProgressState){
+    } else if (state is AuthInProgressState) {
       emit(AuthViewCubitInProgressState());
-    } else if(state is AuthCheckStatusInProgressState){
+    } else if (state is AuthCheckStatusInProgressState) {
       emit(AuthViewCubitInProgressState());
     }
   }

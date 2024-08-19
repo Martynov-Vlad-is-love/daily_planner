@@ -1,7 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
-enum AuthStatus { authorized, notAuthorized, inProgress }
-
 abstract class AuthState {}
 
 class AuthUnauthorizedState extends AuthState {

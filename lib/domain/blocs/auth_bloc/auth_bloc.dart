@@ -28,6 +28,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> onAuthCheckStatusEvent(
       AuthCheckStatusEvent event, Emitter<AuthState> emit) async {
     try {
+      emit(AuthInProgressState());
       final token = await secureStorage.getToken();
       final newState =
           token != null ? AuthAuthorizedState() : AuthUnauthorizedState();
@@ -44,12 +45,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> onAuthLoginEvent(
       AuthLoginEvent event, Emitter<AuthState> emit) async {
     try {
+      emit(AuthInProgressState());
       auth.signInWithEmailAndPassword(event.login, event.password);
       if (auth.uid != null) {
         secureStorage.setToken(auth.uid as String);
         emit(AuthAuthorizedState());
       } else {
-        throw Exception('Account id is null');
+        emit(AuthFailureState('Account id is null'));
       }
     } catch (e) {
       if(e is FirebaseAuthException) {
@@ -63,6 +65,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> onAuthRegisterEvent(
       AuthRegisterEvent event, Emitter<AuthState> emit) async {
     try {
+      emit(AuthInProgressState());
       auth.signUpWithEmailAndPassword(event.login, event.password);
       if (auth.uid != null) {
         secureStorage.setToken(auth.uid as String);

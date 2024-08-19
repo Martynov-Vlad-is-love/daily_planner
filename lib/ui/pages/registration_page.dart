@@ -1,6 +1,8 @@
 import 'package:daily_planner_firebase_bloc/domain/services/firebase_authentication.dart';
+import 'package:daily_planner_firebase_bloc/route_names.dart';
 import 'package:daily_planner_firebase_bloc/ui/navigation/main_navigation.dart';
 import 'package:daily_planner_firebase_bloc/ui/widget/auth_widget/auth_view_cubit.dart';
+import 'package:daily_planner_firebase_bloc/ui/widget/auth_widget/auth_view_cubit_state.dart';
 import 'package:daily_planner_firebase_bloc/ui/widget/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,29 +28,40 @@ class RegistrationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authentication = FirebaseAuthentication();
     return BlocListener<AuthViewCubit, AuthViewCubitState>(
       listener: _onAuthViewCubitStateChanges,
       child: Provider(
         create: (_) => _RegistrationData(),
-        child: Forms(
-          authentication: authentication,
-        ),
+        child: const Forms(),
       ),
     );
   }
 }
 
 class Forms extends StatelessWidget {
-  const Forms({
-    super.key,
-    required FirebaseAuthentication authentication,
-  }) : _authentication = authentication;
+  const Forms({super.key});
 
-  final FirebaseAuthentication _authentication;
+  bool isEqual(String password, String repeatPassword) =>
+      password == repeatPassword;
 
   @override
   Widget build(BuildContext context) {
+    final authData = context.read<_RegistrationData>();
+    final cubit = context.watch<AuthViewCubit>();
+    final canStartAuth = cubit.state is AuthViewCubitInProgressState ||
+        cubit.state is! AuthViewCubitErrorState;
+    onPressed() {
+      if (canStartAuth && isEqual(authData.password, authData.repeatedPassword)) {
+        cubit.register(login: authData.login, password: authData.password);
+        cubit.state is AuthViewCubitSuccessState
+            ? cubit.auth(login: authData.login, password: authData.password)
+            : null;
+        cubit.state is AuthViewCubitSuccessState
+            ? Navigator.pushNamed(context, RouteNames.mainScreen)
+            : null;
+      }
+    }
+
     final registrationData = context.read<_RegistrationData>();
     final List<Widget> textFields = [
       CustomTextField(
@@ -89,27 +102,14 @@ class Forms extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(top: 40.0),
                     child: ElevatedButton(
-                      onPressed: () async {
-                        if (registrationData.password ==
-                            registrationData.repeatedPassword) {
-                          final user =
-                              await _authentication.signUpWithEmailAndPassword(
-                                  registrationData.login,
-                                  registrationData.password);
-                          if (user != null) {
-                            print('Success');
-                          } else {
-                            print('Failure');
-                          }
-                        }
-                      },
+                      onPressed: onPressed,
                       child: const Text('Register'),
                     ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('Do not have an account?'),
+                      const Text('Have an account?'),
                       TextButton(
                           onPressed: () {
                             if (Navigator.canPop(context)) {

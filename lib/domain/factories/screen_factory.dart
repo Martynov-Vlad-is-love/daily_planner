@@ -1,7 +1,10 @@
 import 'package:daily_planner_firebase_bloc/domain/blocs/auth_bloc/auth_bloc.dart';
 import 'package:daily_planner_firebase_bloc/domain/blocs/auth_bloc/auth_state.dart';
+import 'package:daily_planner_firebase_bloc/ui/pages/login_page.dart';
 import 'package:daily_planner_firebase_bloc/ui/pages/main_page.dart';
+import 'package:daily_planner_firebase_bloc/ui/pages/registration_page.dart';
 import 'package:daily_planner_firebase_bloc/ui/widget/auth_widget/auth_view_cubit.dart';
+import 'package:daily_planner_firebase_bloc/ui/widget/auth_widget/auth_view_cubit_state.dart';
 import 'package:daily_planner_firebase_bloc/ui/widget/loader_widget/loader_view_cubit.dart';
 import 'package:daily_planner_firebase_bloc/ui/widget/loader_widget/loader_widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,7 +19,6 @@ class ScreenFactory {
     return BlocProvider<LoaderViewCubit>(
       create: (context) =>
           LoaderViewCubit(LoaderViewCubitState.unknown, authBloc),
-      lazy: false,
       child: const LoaderWidget(),
     );
   }
@@ -26,7 +28,17 @@ class ScreenFactory {
     return BlocProvider<AuthViewCubit>(
       create: (_) =>
           AuthViewCubit(AuthViewCubitFormFillInProgressState(), authBloc),
-      child: const LoaderWidget(),
+      child: const LoginPage(),
+    );
+  }
+
+  Widget makeRegister(){
+    final authBloc = _authBloc ?? AuthBloc(AuthCheckStatusInProgressState());
+    _authBloc = authBloc;
+    return BlocProvider<AuthViewCubit>(
+      create: (_) =>
+          AuthViewCubit(AuthViewCubitFormFillInProgressState(), authBloc),
+      child: const RegistrationPage(),
     );
   }
 
